@@ -33,8 +33,8 @@ jobs:
       - name: Build
         run: |
           mkdir -p build/linux build/windows
-          GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o build/linux/szu-srun-login
-          GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o build/windows/szu-srun-login.exe
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o build/linux/szu-srun-login
+          CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o build/windows/szu-srun-login.exe
 
       - name: Create archives
         run: |
