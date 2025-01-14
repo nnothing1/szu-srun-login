@@ -42,14 +42,13 @@ func Login(username, password, ip string) error {
 	info := EncodeUserInfo(data, challenge)
 
 	//构造chcksum
-	chcksum := srun.Sha1(
-		challenge + username +
-			challenge + encrypted_pwd +
-			challenge + ac_id +
-			challenge + ip +
-			challenge + n +
-			challenge + typ +
-			challenge + info,
+	chcksum := srun.Sha1(challenge + username +
+		challenge + encrypted_pwd +
+		challenge + ac_id +
+		challenge + ip +
+		challenge + n +
+		challenge + typ +
+		challenge + info,
 	)
 
 	//构造请求参数
