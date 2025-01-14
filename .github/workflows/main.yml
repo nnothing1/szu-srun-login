@@ -1,0 +1,60 @@
+name: Release szu-srun-login
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Get dependencies
+        run: go mod download
+
+      - name: Build
+        run: |
+          mkdir -p build/linux build/windows
+          GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o build/linux/szu-srun-login
+          GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o build/windows/szu-srun-login.exe
+
+      - name: Create archives
+        run: |
+          cd build/linux
+          zip szu-srun-login-linux-amd64.zip szu-srun-login
+          mv szu-srun-login-linux-amd64.zip ../
+          
+          cd ../windows
+          zip szu-srun-login-windows-amd64.zip szu-srun-login.exe
+          mv szu-srun-login-windows-amd64.zip ../
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            build/szu-srun-login-linux-amd64.zip
+            build/szu-srun-login-windows-amd64.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
