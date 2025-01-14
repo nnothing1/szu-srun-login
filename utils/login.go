@@ -64,10 +64,10 @@ func Login(username, password, ip string) error {
 	params.Add("info", info)
 	params.Add("chksum", chcksum)
 	params.Add("callback", callback)
-	base_rul := "https://net.szu.edu.cn/cgi-bin/srun_portal"
+	base_url := "https://net.szu.edu.cn/cgi-bin/srun_portal"
 
 	//发送请求
-	resp, err := http.Get(base_rul + "?" + params.Encode())
+	resp, err := http.Get(base_url + "?" + params.Encode())
 	if err != nil {
 		logrus.Fatalf("发送登录请求失败: %v", err)
 		return err
