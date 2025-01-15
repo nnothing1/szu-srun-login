@@ -32,9 +32,10 @@ jobs:
 
       - name: Build
         run: |
-          mkdir -p build/linux build/windows
+          mkdir -p build/linux build/windows build/macos
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o build/linux/szu-srun-login
           CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o build/windows/szu-srun-login.exe
+          CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-s -w" -o build/macos/szu-srun-login
 
       - name: Create archives
         run: |
@@ -45,6 +46,10 @@ jobs:
           cd ../windows
           zip szu-srun-login-windows-amd64.zip szu-srun-login.exe
           mv szu-srun-login-windows-amd64.zip ../
+          
+          cd ../macos
+          zip szu-srun-login-macos-arm64.zip szu-srun-login
+          mv szu-srun-login-macos-arm64.zip ../
 
       - name: Create Release
         id: create_release
@@ -53,9 +58,10 @@ jobs:
           files: |
             build/szu-srun-login-linux-amd64.zip
             build/szu-srun-login-windows-amd64.zip
+            build/szu-srun-login-macos-arm64.zip
           draft: false
           prerelease: false
-          generate_release_notes: false
-          body:  ${{ steps.tag.outputs.message }}
+          generate_release_notes: true
+          body: ${{ steps.tag.outputs.message }}
         env:
           GITHUB_TOKEN: ${{ secrets.SZU_SRUN_LOGIN }}
