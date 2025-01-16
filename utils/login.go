@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/Mmx233/BitSrunLoginGo/pkg/srun"
 	"github.com/sirupsen/logrus"
 )
 
@@ -27,28 +26,23 @@ func Login(username, password, ip string) error {
 	encrypted_pwd := EncryptPassword(challenge, password)
 
 	//构造info并加密
-	var data struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Ip       string `json:"ip"`
-		Acid     string `json:"acid"`
-		EncVer   string `json:"enc_ver"`
+	info := UserInfo{
+		Username: username,
+		Password: encrypted_pwd,
+		Ip:       ip,
+		Acid:     ac_id,
+		EncVer:   enc,
 	}
-	data.Username = username
-	data.Password = password
-	data.Ip = ip
-	data.Acid = ac_id
-	data.EncVer = enc
-	info := EncodeUserInfo(data, challenge)
+	encodedInfo := info.Encode(challenge)
 
 	//构造chcksum
-	chcksum := srun.Sha1(challenge + username +
+	chcksum := Sha1(challenge + username +
 		challenge + encrypted_pwd +
 		challenge + ac_id +
 		challenge + ip +
 		challenge + n +
 		challenge + typ +
-		challenge + info,
+		challenge + encodedInfo,
 	)
 
 	//构造请求参数
@@ -60,7 +54,7 @@ func Login(username, password, ip string) error {
 	params.Add("ip", ip)
 	params.Add("username", username)
 	params.Add("password", "{MD5}"+encrypted_pwd)
-	params.Add("info", info)
+	params.Add("info", encodedInfo)
 	params.Add("chksum", chcksum)
 	params.Add("callback", callback)
 	base_url := "https://net.szu.edu.cn/cgi-bin/srun_portal"

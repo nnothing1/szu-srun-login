@@ -3,11 +3,8 @@ package utils
 import (
 	"crypto/hmac"
 	"crypto/md5"
+	"crypto/sha1"
 	"encoding/hex"
-	"encoding/json"
-
-	"github.com/Mmx233/BitSrunLoginGo/pkg/srun"
-	"github.com/sirupsen/logrus"
 )
 
 func EncryptPassword(challenge, password string) string {
@@ -17,12 +14,8 @@ func EncryptPassword(challenge, password string) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-func EncodeUserInfo(info any, challenge string) string {
-	// 将info编码为JSON格式，并使用XEncode进行加密
-	infoBytes, err := json.Marshal(info)
-	if err != nil {
-		logrus.Fatalf("编码Info失败: %v", err)
-	}
-	encryptedInfo := srun.Base64(srun.XEncode(string(infoBytes), challenge))
-	return "{SRBX1}" + encryptedInfo
+func Sha1(data string) string {
+	hash := sha1.New()
+	hash.Write([]byte(data))
+	return hex.EncodeToString(hash.Sum(nil))
 }
