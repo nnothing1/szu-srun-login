@@ -15,11 +15,19 @@ type UserInfo struct {
 	EncVer   string `json:"enc_ver"`
 }
 
+// 避免数组越界，如果越界返回0值
+func charCodeAt(s string, i uint32) uint32 {
+	if i < uint32(len(s)) {
+		return uint32(s[i])
+	}
+	return 0
+}
+
 func (info UserInfo) s(a string, b bool) []uint32 {
 	c := uint32(len(a))
 	v := []uint32{}
 	for i := uint32(0); i < c; i += 4 {
-		v = append(v, uint32(a[i])|uint32(a[i+1])<<8|uint32(a[i+2])<<16|uint32(a[i+3])<<24)
+		v = append(v, charCodeAt(a, i)|charCodeAt(a, i+1)<<8|charCodeAt(a, i+2)<<16|charCodeAt(a, i+3)<<24)
 	}
 	if b {
 		v = append(v, c)
