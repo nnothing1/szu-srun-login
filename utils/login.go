@@ -28,7 +28,7 @@ func Login(username, password, ip string) error {
 	//构造info并加密
 	info := UserInfo{
 		Username: username,
-		Password: encrypted_pwd,
+		Password: password,
 		Ip:       ip,
 		Acid:     ac_id,
 		EncVer:   enc,
