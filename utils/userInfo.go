@@ -38,7 +38,7 @@ func (info UserInfo) s(a string, b bool) []uint32 {
 func (info UserInfo) Encode(challenge string) string {
 	infoBytes, err := json.Marshal(info)
 	if err != nil {
-		logrus.Fatalf("编码Info失败: %v", err)
+		logrus.Errorf("编码Info失败: %v", err)
 	}
 
 	infoStr := string(infoBytes)

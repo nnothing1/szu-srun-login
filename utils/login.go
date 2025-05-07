@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -62,7 +63,7 @@ func Login(username, password, ip string) error {
 	//发送请求
 	resp, err := http.Get(base_url + "?" + params.Encode())
 	if err != nil {
-		logrus.Fatalf("发送登录请求失败: %v", err)
+		logrus.Errorf("发送登录请求失败: %v", err)
 		return err
 	}
 	defer resp.Body.Close()
@@ -70,11 +71,11 @@ func Login(username, password, ip string) error {
 	//读取响应内容
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logrus.Fatalf("读取响应内容失败: %v", err)
+		logrus.Errorf("读取响应内容失败: %v", err)
 		return err
 	}
 	if err := parseLoginBody(body[len(callback)+1 : len(body)-1]); err != nil {
-		logrus.Fatalf("解析登录响应失败: %v", err)
+		logrus.Errorf("解析登录响应失败: %v", err)
 	}
 	return nil
 }
@@ -91,7 +92,7 @@ func getChallenge(username, ip, callback string) (string, error) {
 	//发送请求
 	resp, err := http.Get(base_url + "?" + params.Encode())
 	if err != nil {
-		logrus.Fatalf("发送获取challenge请求失败: %v", err)
+		logrus.Errorf("发送获取challenge请求失败: %v", err)
 		return "", err
 	}
 	defer resp.Body.Close()
@@ -99,18 +100,25 @@ func getChallenge(username, ip, callback string) (string, error) {
 	//读取响应内容
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logrus.Fatalf("读取challenge请求响应内容失败: %v", err)
+		logrus.Errorf("读取challenge请求响应内容失败: %v", err)
 		return "", err
 	}
 
 	//解析JSON响应内容
 	var challenge struct {
 		Challenge string `json:"challenge"`
+		Err       string `json:"error"`
 	}
 	if err = json.Unmarshal(body[len(callback)+1:len(body)-1], &challenge); err != nil {
-		logrus.Fatalf("解析challenge响应内容失败: %v", err)
+		logrus.Errorf("解析challenge响应内容失败: %v", err)
 		return "", err
 	}
+
+	if challenge.Err != "ok" {
+		err = errors.New(challenge.Err)
+		return "", err
+	}
+
 	return challenge.Challenge, nil
 }
 

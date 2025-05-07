@@ -26,3 +26,4 @@ go.work.sum
 
 # output directory
 /output/
+.DS_Store
