@@ -76,6 +76,7 @@ func Login(username, password, ip string) error {
 	}
 	if err := parseLoginBody(body[len(callback)+1 : len(body)-1]); err != nil {
 		logrus.Errorf("解析登录响应失败: %v", err)
+		return err
 	}
 	return nil
 }

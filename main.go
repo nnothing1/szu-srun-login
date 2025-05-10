@@ -46,5 +46,4 @@ func main() {
 			logrus.Errorf("登录出错: %v", err)
 		}
 	}
-
 }
