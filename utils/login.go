@@ -10,8 +10,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func Login(username, password, ip string) error {
-	callback := "callback"                                 //随机字符串就行
+func Login(username, password string) error {
+	callback := "callback" //随机字符串就行
+
+	//获取IP地址
+	ip, err := GetIP()
+	if err != nil {
+		return err
+	}
+
 	challenge, err := getChallenge(username, ip, callback) //先获取challenge
 	if err != nil {
 		return err
